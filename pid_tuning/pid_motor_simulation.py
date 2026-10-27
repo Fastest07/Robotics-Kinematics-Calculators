@@ -3,12 +3,15 @@ import matplotlib.pyplot as plt
 
 def pid_controller(target, current, prev_error, integral, dt):
     kp = 2.0
-    ki = 0.
+    ki = 3.0
     kd = 0.8
     
     error = target - current
     p = kp * error
-    new_integral = integral + (error * dt)
+    if abs(error) < 10:
+        new_integral = integral + (error * dt)
+    else:
+        new_integral = 0.0
     i = ki * new_integral
     d = kd * ((error - prev_error) / dt)
     
@@ -18,6 +21,7 @@ def pid_controller(target, current, prev_error, integral, dt):
 torque_constant = 5.0
 friction_coefficient = 2.0
 time_step = 0.01
+payload_torque = 20.0
 
 current_angle = 0.0
 velocity = 0.0
@@ -36,7 +40,7 @@ for step in range(300):
     
     voltage, previous_error, accumulated_integral = pid_controller(target_angle, current_angle, previous_error, accumulated_integral, time_step)
 
-    acceleration = (voltage * torque_constant) - (velocity * friction_coefficient)
+    acceleration = (voltage * torque_constant) - (velocity * friction_coefficient) - payload_torque
     velocity += acceleration * time_step
     current_angle += velocity * time_step
 
